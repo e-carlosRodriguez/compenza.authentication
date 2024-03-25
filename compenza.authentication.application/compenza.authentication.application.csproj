@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\" />
+    <Folder Include="Mapping\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\compenza.authentication.percistance\compenza.authentication.percistance.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="eSoftware.Utilerias">
+      <HintPath>..\..\..\..\Downloads\eSoftware.Utilerias.dll</HintPath>
+    </Reference>
+    <Reference Include="eSoftware.Utilerias.Export">
+      <HintPath>..\..\..\2\Repos\artifact\eSoftware.Utilerias.Export.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
