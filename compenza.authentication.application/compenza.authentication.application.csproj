@@ -8,15 +8,19 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Commands\" />
     <Folder Include="Mapping\" />
+    <Folder Include="lcn\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Compenza\compenza-producto\CompenzaProducto\eSoftware.Licensing\eSoftware.Licensing.csproj" />
     <ProjectReference Include="..\compenza.authentication.percistance\compenza.authentication.percistance.csproj" />
   </ItemGroup>
 

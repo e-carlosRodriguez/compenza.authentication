@@ -1,16 +1,22 @@
-﻿namespace compenza.authentication.api.Payloads.Response
+﻿using System.Net;
+using System.Text.Json.Serialization;
+
+namespace compenza.authentication.api.Payloads.Response
 {
     public class ApiResponse<T>
     {
-        public bool Res { get; set; }
-        public string Mensaje { get; set; }
-        public T Objeto  { get; set; }
+        [JsonPropertyName("StatusCode")]
+        public HttpStatusCode StatusCode { get; set; }
 
-        public ApiResponse(bool res, string mensaje, T objeto) 
-        { 
-            this.Res = res;
-            this.Mensaje = mensaje;
-            this.Objeto = objeto;
+        [JsonPropertyName("Message")]
+        public string Message { get; set; }
+
+        [JsonPropertyName("Data")]
+        public T Data { get; set; }
+
+        public ApiResponse(T data)
+        {
+            this.Data = data;
         }
     }
 }
