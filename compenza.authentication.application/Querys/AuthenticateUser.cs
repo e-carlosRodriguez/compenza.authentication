@@ -1,9 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
 using compenza.authentication.domain.Enums;
+using compenza.authentication.domain.Entities;
 using compenza.authentication.domain.Configure;
-using compenza.authentication.percistance.Interfaces;
 using compenza.authentication.application.Utilities;
+using compenza.authentication.percistance.Interfaces;
 using compenza.authentication.application.Exceptions;
 
 namespace compenza.authentication.application.Querys
@@ -22,43 +23,103 @@ namespace compenza.authentication.application.Querys
         {
             private readonly ILoginRepository _loginRepository;
             private readonly IStringsEncrypter _encrypter;
+            private readonly ITokenProvider _tokenProvider;
             private readonly Settings _settings;
 
-            public Handler(ILoginRepository loginRepository, IOptions<Settings> Settings, IStringsEncrypter encrypter)
+            public Handler(ILoginRepository loginRepository, IOptions<Settings> Settings, IStringsEncrypter encrypter, ITokenProvider tokenProvider)
             {
                 _loginRepository = loginRepository;
                 _settings = Settings.Value;
                 _encrypter = encrypter;
+                _tokenProvider = tokenProvider;
             }
 
             public async Task<Result> Handle(Query request, CancellationToken cancellationToken)
             {
                 var result = new Result();
                 var dsEmpleado = await _loginRepository.ConsultarLogin(request.LoginName);
-                if ( dsEmpleado is not null )
+
+                if (dsEmpleado is not null && (dsEmpleado.password == _encrypter.EncriptarCadena(request.Password)))
                 {
-                    if (dsEmpleado.bActivo && ( dsEmpleado.bIngresaPortal  || Convert.ToInt32(dsEmpleado.cveEmpleado) < 1 ))
+                    if (dsEmpleado.bActivo && (dsEmpleado.bIngresaPortal || Convert.ToInt32(dsEmpleado.cveEmpleado) < 1))
                     {
-                        if (_settings.Debug || ( dsEmpleado.password == _encrypter.EncriptarCadena(request.Password) ) )
+                        if (dsEmpleado.cveUsuario > 0)
                         {
-                            if ( dsEmpleado.cveUsuario > 0 )
+                            //var cambiarPassword = DateTime.Parse(dsEmpleado.cambiarPassword);
+                            //var diasCambio = await _loginRepository.ObtenerConfiguracion(2);
+                            //pasos de usuarios externos
+                        }
+
+                        var cvePerfil = Convert.ToInt32(dsEmpleado.cvePerfil);
+                        var permisos = await _loginRepository.ListarPermisos(0, cvePerfil);
+                        var proceso = ProcesoPortal(permisos);
+
+                        //se tomara en cuenta solo Portal por el momento
+                        var claveSistema =
+                            proceso.Portal ? (int)eSistemasCompenza.Portal :
+                            proceso.Objetivos ? (int)eSistemasCompenza.Objetivos :
+                            proceso.Viajes ? (int)eSistemasCompenza.Viajes : 2;
+
+                        if (claveSistema is 2)
+                        {
+                            var nombreCliente = await _loginRepository.ObtenerConfiguracion((int)eConfiguracionSistema.NombreCliente);
+
+                            //validar licencia
+
+                            var TieneMesajesResult = await TieneMensajes(dsEmpleado.cveEmpleado);
+                            var ValidarFamiliasRevision = _loginRepository.TieneFamilias(0, Convert.ToInt32(dsEmpleado.cveEmpleado), true);
+                            var procesoInicio = permisos.First(item => item.cveProceso == (int)eProcesosMenu.PortalInicio);
+
+                            if (cvePerfil <= 0 || (procesoInicio is not null && procesoInicio.bAutorizar))
                             {
-                                //var cambiarPassword = DateTime.Parse(dsEmpleado.cambiarPassword);
-                                //var diasCambio = await _loginRepository.ObtenerConfiguracion(2);
-                                //pasos de usuarios externos
-                            }
+                                var tieneReglas = true;
 
-                            var cvePerfil = -1;
-                            int.TryParse(dsEmpleado.cvePerfil, out cvePerfil);
-                            var permisos = await _loginRepository.ListarPermisos(0, cvePerfil);
+                                await Task.WhenAll(new Task[] { ValidarFamiliasRevision });
+                                var ValidarFamiliasRevisionResult = ValidarFamiliasRevision.IsCompletedSuccessfully ? ValidarFamiliasRevision.Result : 0;
 
-                            var permisosPortal = permisos.Any( p => p.cveProceso == (int)eProcesosMenu.PortalInicio || p.cveProceso == (int)eProcesosMenu.PortalAclaraciones );
+                                result.Objeto = (int)eResultado.Redirect;
+                                result.Mensaje = (tieneReglas && (ValidarFamiliasRevisionResult > 0)) ? "revision/revision" : "/";
 
-                            if (permisosPortal)
-                            {
-                                result.Mensaje = "login";
+                                if (TieneMesajesResult is not null && TieneMesajesResult.Res)
+                                {
+                                    result.Objeto = TieneMesajesResult.Objeto;
+                                    result.Mensaje = TieneMesajesResult.Mensaje;
+                                }
+
+                                if (!tieneReglas && !TieneMesajesResult.Res)
+                                {
+                                    result.Mensaje = "/";
+                                }
+
+                                await _loginRepository.AuditoriaProcesos((int)eProcesosMenu.PortalAclaraciones, (int)eAcciones.Login, dsEmpleado.cveUsuario);
+                                var token = _tokenProvider.GetTokenAsync(dsEmpleado, claveSistema, nombreCliente.ValorString, permisos /*reglas de licencia*/);
+                                result.Token = token;
+
                                 return result;
                             }
+
+                            var procesoAcalaraciones = permisos.First(item => item.cveProceso == (int)eProcesosMenu.PortalAclaraciones);
+                            if ((procesoAcalaraciones is not null && procesoAcalaraciones.bAutorizar)) 
+                            {
+                                if (TieneMesajesResult.Res)
+                                {
+                                    result.Objeto = TieneMesajesResult.Objeto;
+                                    result.Mensaje = TieneMesajesResult.Mensaje;
+                                }
+                                else
+                                {
+                                    result.Objeto = (int)eResultado.Redirect;
+                                    result.Mensaje = "/Tickets/Tickets";
+                                }
+                                
+                                await _loginRepository.AuditoriaProcesos((int)eProcesosMenu.PortalAclaraciones, (int)eAcciones.Login, dsEmpleado.cveUsuario);
+                                var token = _tokenProvider.GetTokenAsync(dsEmpleado, claveSistema, nombreCliente.ValorString, permisos /*reglas de licencia*/);
+                                result.Token = token;
+
+                                return result;
+                            }
+
+                            return result;
                         }
                     }
 
@@ -66,7 +127,7 @@ namespace compenza.authentication.application.Querys
                     result.Res = false;
                     result.Objeto = (int)eResultado.Error;
 
-                    throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Bad request" , result );
+                    throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Bad request", result);
                 }
 
                 result.Mensaje = "Usuario y/o contraseña incorrectos";
@@ -74,6 +135,42 @@ namespace compenza.authentication.application.Querys
                 result.Objeto = (int)eResultado.Error;
 
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Bad request", result);
+            }
+
+            private PermisoProceso ProcesoPortal(IEnumerable<Permisos> perfilProceso)
+            {
+                bool permisoPortal = perfilProceso.AsEnumerable().Any(x =>
+                   x.cveProceso == (int)eProcesosMenu.PortalInicio
+                   || x.cveProceso == (int)eProcesosMenu.PortalAclaraciones);
+
+                bool permisoObjetivos = perfilProceso.AsEnumerable().Any(x =>
+                    x.cveProceso == (int)eProcesosMenu.InicioObjetivos);
+
+                bool permisoViajes = perfilProceso.AsEnumerable().Any(x =>
+                    x.cveProceso == (int)eProcesosMenu.InicioViajes);
+
+                return new PermisoProceso()
+                {
+                    Portal = permisoPortal,
+                    Objetivos = permisoObjetivos,
+                    Viajes = permisoViajes
+                };
+            }
+
+            private async Task<Result> TieneMensajes( int cveEmpleado )
+            {
+                var response = new Result();
+                var result = await _loginRepository.TieneMensajes(cveEmpleado, DateTime.Now);
+                if (result > 0)
+                {
+                    response.Objeto = (int)eResultado.Redirect;
+                    response.Mensaje = "mensajes/mensajes";
+
+                    return response;
+                }
+
+                response.Res = false;
+                return response;
             }
         }
     }

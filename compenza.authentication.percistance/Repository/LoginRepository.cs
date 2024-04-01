@@ -58,7 +58,48 @@ namespace compenza.authentication.percistance.Repository
                 return configuracion;
             }
         }
-    
 
+        public async Task<int> TieneFamilias(int periocidad, int cveEmpleado, bool bConfirmado)
+        {
+            using (var conn = _compenzaDbContext.GetConeConnection())
+            {
+                var result = await conn.QueryAsync<int>("Portal.SP_Portal_ConsultaEsquemasRevision", new 
+                { 
+                    Accion = 4,
+                    cveFamRevision = 0,
+                    cvePeriodicidad = periocidad,
+                    cveEmpleado = cveEmpleado,
+                    bConfirmado = bConfirmado,
+                    cveUsuario = 0
+                }, commandType: System.Data.CommandType.StoredProcedure);
+                return result.Count();
+            }
+        }
+
+        public async Task<int> TieneMensajes(int cveEmpleado, DateTime fechaVijencia)
+        {
+            using (var conn = _compenzaDbContext.GetConeConnection())
+            {
+                var result = await conn.QueryAsync<int>("Portal.SP_Portal_Mensajes", new ConsultarMensajes(Accion: 12, FechaVijencia: fechaVijencia, CveUsuario: cveEmpleado), commandType: System.Data.CommandType.StoredProcedure);
+                return result.FirstOrDefault();
+            }
+        }
+
+        public async Task AuditoriaProcesos(int cveProceso, int cveAccion, int cveUsuario)
+        {
+            using (var conn = _compenzaDbContext.GetConeConnection())
+            {
+                var isCreated = await conn.ExecuteAsync("Compenza.SP_Compenza_BitacoraSistema", new { 
+                
+                    Accion = 1,
+                    cveProceso = cveProceso,
+                    cveAccion = cveAccion,
+                    cveUsuario = cveUsuario,
+                    fechaInicial = DateTime.Now,
+                    fechaFinal = DateTime.Now
+                
+                }, commandType: System.Data.CommandType.StoredProcedure);
+            }
+        }
     }
 }

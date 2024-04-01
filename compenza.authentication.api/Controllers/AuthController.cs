@@ -1,11 +1,11 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using compenza.authentication.api.Payloads.Request;
-using compenza.authentication.application.Querys;
-using compenza.authentication.application.Exceptions;
-using compenza.authentication.api.Payloads.Response;
-using compenza.authentication.domain.Configure;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using compenza.authentication.domain.Configure;
+using compenza.authentication.application.Querys;
+using compenza.authentication.api.Payloads.Request;
+using compenza.authentication.api.Payloads.Response;
+using compenza.authentication.application.Exceptions;
 
 namespace compenza.authentication.api.Controllers
 {
@@ -36,7 +36,6 @@ namespace compenza.authentication.api.Controllers
             }
             catch (HttpException e)
             {
-
                 throw new HttpException(e.StatusCode, e.Message, e.Errors);
             }
         }
