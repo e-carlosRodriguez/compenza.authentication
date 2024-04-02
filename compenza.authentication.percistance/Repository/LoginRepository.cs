@@ -16,7 +16,7 @@ namespace compenza.authentication.percistance.Repository
             _compenzaDbContext = compenzaDbContext;
         }
 
-        public async Task<IEnumerable<Permisos>?> ListarPermisos(int proceso, int cveUsuario)
+        public async Task<IEnumerable<Permisos>> ListarPermisos(int proceso, int cveUsuario)
         {
             using (var conn = _compenzaDbContext.GetConeConnection())
             {

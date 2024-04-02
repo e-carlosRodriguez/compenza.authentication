@@ -31,7 +31,8 @@ namespace compenza.authentication.domain.Enums
 
     public enum eConfiguracionSistema
     {
-        NombreCliente = 48
+        NombreCliente = 48,
+        diasCambioPassword = 3,
     }
 
     public enum eAcciones

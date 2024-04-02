@@ -16,5 +16,7 @@ namespace compenza.authentication.domain.Entities
         public bool bIngresaPortal { get; set; }
         public string idioma { get; set; }
         public int? cveClaveCova { get; set; }
+        public bool? UsExterno { get; set; }
+        public int? cveProveedor { get; set; }
     }
 }
