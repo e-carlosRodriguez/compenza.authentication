@@ -16,6 +16,7 @@ namespace compenza.authentication.application
             services.AddMediatR(options => options.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
             services.Configure<EncryptSecrets>(configuration.GetSection("EncryptSecrets"));
             services.AddTransient<IStringsEncrypter, Encrypt>();
+            services.AddTransient<ITokenProvider, TokenProvider>();
 
             return services;
         }

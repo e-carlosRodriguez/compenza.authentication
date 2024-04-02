@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Net;
+﻿using System.Net;
+using eSoftware.Utilerias;
+using Microsoft.AspNetCore.Http;
+using compenza.authentication.domain.Configure;
 
 namespace compenza.authentication.application.Exceptions
 {
@@ -20,7 +22,6 @@ namespace compenza.authentication.application.Exceptions
             }
             catch (Exception exception)
             {
-                //log de errores o algo asi :p
                 await HandleExceptionAsync(context, exception);
             }
         }
@@ -43,6 +44,8 @@ namespace compenza.authentication.application.Exceptions
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)errorResponse.StatusCode;
+
+            //eSoftware.Utilerias.ControlErrores.LogError(context.Response.StatusCode.ToString(), exception, errorResponse.Message);
             await context.Response.WriteAsync(errorResponse.ToJsonString());
         }
     }
