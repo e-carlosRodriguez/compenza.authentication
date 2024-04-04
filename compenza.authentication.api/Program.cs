@@ -1,9 +1,9 @@
+using Serilog;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using compenza.authentication.application;
 using compenza.authentication.application.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +33,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+builder.Host.UseSerilog();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,6 +45,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();

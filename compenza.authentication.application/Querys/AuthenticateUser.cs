@@ -37,6 +37,7 @@ namespace compenza.authentication.application.Querys
             public async Task<Result> Handle(Query request, CancellationToken cancellationToken)
             {
                 var result = new Result();
+
                 var dsEmpleado = await _loginRepository.ConsultarLogin(request.LoginName);
                 var cveEmpleado = Convert.ToInt32(dsEmpleado?.cveEmpleado) > 1;
 
@@ -51,7 +52,6 @@ namespace compenza.authentication.application.Querys
 
                     throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Bad request", result);
                 }
-
                 if (dsEmpleado.cveUsuario > 0)
                 {
                     var cambiarPassword = DateTime.Parse(dsEmpleado.cambiarPassword);
@@ -79,9 +79,6 @@ namespace compenza.authentication.application.Querys
                 if (claveSistema is 2)
                 {
                     var nombreCliente = await _loginRepository.ObtenerConfiguracion((int)eConfiguracionSistema.NombreCliente);
-
-                    //validar licencia
-
                     var TieneMesajesResult = await TieneMensajes(dsEmpleado.cveEmpleado);
                     var ValidarFamiliasRevision = _loginRepository.TieneFamilias(0, Convert.ToInt32(dsEmpleado.cveEmpleado), true);
                     var procesoInicio = permisos.First(item => item.cveProceso == (int)eProcesosMenu.PortalInicio);
@@ -91,7 +88,7 @@ namespace compenza.authentication.application.Querys
                         var tieneReglas = true;
 
                         await Task.WhenAll(new Task[] { ValidarFamiliasRevision });
-                        var ValidarFamiliasRevisionResult = ValidarFamiliasRevision.IsCompletedSuccessfully ? ValidarFamiliasRevision.Result : 0;
+                        var ValidarFamiliasRevisionResult = ValidarFamiliasRevision.IsCompletedSuccessfully ? ValidarFamiliasRevision.Result.Count() : 0;
 
                         result.Objeto = (int)eResultado.Redirect;
                         result.Mensaje = (tieneReglas && (ValidarFamiliasRevisionResult > 0)) ? "revision/revision" : "/";

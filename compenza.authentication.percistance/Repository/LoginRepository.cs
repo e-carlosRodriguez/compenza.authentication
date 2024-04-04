@@ -59,7 +59,7 @@ namespace compenza.authentication.percistance.Repository
             }
         }
 
-        public async Task<int> TieneFamilias(int periocidad, int cveEmpleado, bool bConfirmado)
+        public async Task<IEnumerable<int>> TieneFamilias(int periocidad, int cveEmpleado, bool bConfirmado)
         {
             using (var conn = _compenzaDbContext.GetConeConnection())
             {
@@ -72,7 +72,7 @@ namespace compenza.authentication.percistance.Repository
                     bConfirmado = bConfirmado,
                     cveUsuario = 0
                 }, commandType: System.Data.CommandType.StoredProcedure);
-                return result.Count();
+                return result;
             }
         }
 
