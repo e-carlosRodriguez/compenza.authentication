@@ -23,7 +23,7 @@ namespace compenza.authentication.application.Utilities
             var claims = new Dictionary<string, object?>();
 
             claims.Add("cveSistema", cveSistemas);
-            claims.Add("iIdUsuario", emp.cveUsuario);
+            claims.Add("IdUsuario", emp.cveUsuario);
             claims.Add("sNombre", emp.Nombre);
             claims.Add("eMail", emp.eMail);
             claims.Add("cvePerfil", emp.cvePerfil);
