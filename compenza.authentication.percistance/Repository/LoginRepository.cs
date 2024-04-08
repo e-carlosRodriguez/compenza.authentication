@@ -4,6 +4,7 @@ using compenza.authentication.domain.Entities;
 using compenza.authentication.domain.Parameters;
 using compenza.authentication.percistance.Interfaces;
 using Dapper.Contrib.Extensions;
+using System.Data;
 
 namespace compenza.authentication.percistance.Repository
 {
@@ -59,7 +60,7 @@ namespace compenza.authentication.percistance.Repository
             }
         }
 
-        public async Task<int> TieneFamilias(int periocidad, int cveEmpleado, bool bConfirmado)
+        public async Task<IEnumerable<int>> TieneFamilias(int periocidad, int cveEmpleado, bool bConfirmado)
         {
             using (var conn = _compenzaDbContext.GetConeConnection())
             {
@@ -72,7 +73,7 @@ namespace compenza.authentication.percistance.Repository
                     bConfirmado = bConfirmado,
                     cveUsuario = 0
                 }, commandType: System.Data.CommandType.StoredProcedure);
-                return result.Count();
+                return result;
             }
         }
 
@@ -99,6 +100,17 @@ namespace compenza.authentication.percistance.Repository
                     fechaFinal = DateTime.Now
                 
                 }, commandType: System.Data.CommandType.StoredProcedure);
+            }
+        }
+
+        public async Task<(int, int)> UsuarioEmpleadoActivos()
+        {
+            using (var conn = _compenzaDbContext.GetConeConnection())
+            {
+                var empleados = await conn.QueryAsync<int>("SELECT COUNT(*) FROM Compenza.TC_Empleados WHERE bActivo = 1 AND bIngresaPortal = 1", null);
+                var usuarios = await conn.QueryAsync<int>("SELECT COUNT(*) FROM Compenza.TC_Usuarios WHERE bActivo = 1", null);
+
+                return (empleados.FirstOrDefault(), usuarios.FirstOrDefault());
             }
         }
     }

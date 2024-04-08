@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Compenza\compenza-producto\CompenzaProducto\eSoftware.Licensing\eSoftware.Licensing.csproj" />
+    <ProjectReference Include="..\..\Licencia\License\License.csproj" />
     <ProjectReference Include="..\compenza.authentication.percistance\compenza.authentication.percistance.csproj" />
   </ItemGroup>
 
