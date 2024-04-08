@@ -44,9 +44,9 @@ namespace compenza.authentication.application.Querys
                 if (dsEmpleado is null || (!dsEmpleado.bActivo && (!dsEmpleado.bIngresaPortal || cveEmpleado)) || (!_settings.Debug && !(dsEmpleado.password == _encrypter.EncriptarCadena(request.Password))))
                 {
                     result.Mensaje =
-                       dsEmpleado is null || !(!_settings.Debug && dsEmpleado.password == _encrypter.EncriptarCadena(request.Password)) ? "Usuario y/o contraseña incorrectos" :
-                       !dsEmpleado.bActivo ? "Usuario inactivo" :
-                       (!dsEmpleado.bActivo && (!dsEmpleado.bIngresaPortal || cveEmpleado)) ? "Sin acceso a portal" : "Contactar a soporte";
+                       dsEmpleado is null || !(!_settings.Debug && dsEmpleado.password == _encrypter.EncriptarCadena(request.Password)) ? "lblUsuarioIncorrecto" :
+                       !dsEmpleado.bActivo ? "lblUsuarioInactivo" :
+                       (!dsEmpleado.bActivo && (!dsEmpleado.bIngresaPortal || cveEmpleado)) ? "lblUsuarioSinPortal" : "Contactar a soporte";
                     result.Res = false;
                     result.Objeto = (int)eResultado.Error;
 
@@ -81,17 +81,22 @@ namespace compenza.authentication.application.Querys
                     var nombreCliente = await _loginRepository.ObtenerConfiguracion((int)eConfiguracionSistema.NombreCliente);
                     var TieneMesajesResult = await TieneMensajes(dsEmpleado.cveEmpleado);
                     var ValidarFamiliasRevision = _loginRepository.TieneFamilias(0, Convert.ToInt32(dsEmpleado.cveEmpleado), true);
+                    var UsuarioEmpleadoActivos = _loginRepository.UsuarioEmpleadoActivos();
                     var procesoInicio = permisos.First(item => item.cveProceso == (int)eProcesosMenu.PortalInicio);
 
                     if (cvePerfil <= 0 || (procesoInicio is not null && procesoInicio.bAutorizar))
                     {
-                        var tieneReglas = true;
 
-                        await Task.WhenAll(new Task[] { ValidarFamiliasRevision });
+                        await Task.WhenAll(new Task[] { ValidarFamiliasRevision, UsuarioEmpleadoActivos });
                         var ValidarFamiliasRevisionResult = ValidarFamiliasRevision.IsCompletedSuccessfully ? ValidarFamiliasRevision.Result.Count() : 0;
+                        var ( empleados, usuarios ) = UsuarioEmpleadoActivos.IsCompletedSuccessfully ? UsuarioEmpleadoActivos.Result : (0,0);
+
+
+                        var licencia = License.PropertiesConfig.Information();                       
+                        var tienReglas = ValidarLicencia(licencia, empleados, usuarios, out result);
 
                         result.Objeto = (int)eResultado.Redirect;
-                        result.Mensaje = (tieneReglas && (ValidarFamiliasRevisionResult > 0)) ? "revision/revision" : "/";
+                        result.Mensaje = (tienReglas && (ValidarFamiliasRevisionResult > 0)) ? "Revision/Revision" : "/";
 
                         if (TieneMesajesResult is not null && TieneMesajesResult.Res)
                         {
@@ -99,7 +104,7 @@ namespace compenza.authentication.application.Querys
                             result.Mensaje = TieneMesajesResult.Mensaje;
                         }
 
-                        if (!tieneReglas && !TieneMesajesResult.Res)
+                        if (!tienReglas && !TieneMesajesResult.Res)
                         {
                             result.Mensaje = "/";
                         }
@@ -162,13 +167,43 @@ namespace compenza.authentication.application.Querys
                 if (result > 0)
                 {
                     response.Objeto = (int)eResultado.Redirect;
-                    response.Mensaje = "mensajes/mensajes";
+                    response.Mensaje = "Mensajes/Mensajes";
 
                     return response;
                 }
 
                 response.Res = false;
                 return response;
+            }
+            
+            private bool ValidarLicencia(License.Parameters license, int empleados, int usuarios, out Result result)
+            {
+                var isValidLisence = true;
+                result = new Result();
+
+                if (license is null)
+                {
+                    isValidLisence = false;
+                    result.Mensaje = "msgLicenciaInvalida";
+                    result.Objeto = isValidLisence ? "" : (int)eResultado.ErrorLicencia;
+                }
+                if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
+                {
+                    result.Mensaje = "msgLicenciaExpirada";
+                    isValidLisence = false;
+                }
+                if (empleados > (license.Empleados + (license.Empleados * 0.3)))
+                {
+                    result.Mensaje = "msgLicenciaLimiteEmpleados";
+                    isValidLisence = false;
+                }
+                if (usuarios > (license.Usuarios + (license.Usuarios * 0.3)))
+                {
+                    result.Mensaje = "msgLicenciaLimiteUsuarios";
+                    isValidLisence = false;
+                }
+
+                return isValidLisence;
             }
         }
     }

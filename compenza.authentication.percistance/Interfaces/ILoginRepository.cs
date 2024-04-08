@@ -11,5 +11,6 @@ namespace compenza.authentication.percistance.Interfaces
         Task<IEnumerable<int>> TieneFamilias(int periocidad, int cveEmpleado, bool bConfirmado);
         Task<int> TieneMensajes(int cveEmpleado, DateTime fechaVijencia);
         Task AuditoriaProcesos(int cveProceso, int cveAccion, int cveUsuario);
+        Task<(int, int)> UsuarioEmpleadoActivos();
     }
 }

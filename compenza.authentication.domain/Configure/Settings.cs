@@ -12,5 +12,6 @@ namespace compenza.authentication.domain.Configure
         public Conexion conexion { get; set; }
         public string TipoConexion { get; set; }
         public bool Debug { get; set; }
+        public string TokenSecret { get; set; }
     }
 }

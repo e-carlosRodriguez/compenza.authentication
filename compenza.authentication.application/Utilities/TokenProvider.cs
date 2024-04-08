@@ -19,7 +19,7 @@ namespace compenza.authentication.application.Utilities
         public string GetTokenAsync(Empleado emp, int cveSistemas, string nombreClient, IEnumerable<Permisos> permisos)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var MAC = new HMACSHA256(Encoding.ASCII.GetBytes("1qaz-2wsxx-2wxx-2sxxc-2sxwccd-2srdewfwe"));
+            var MAC = new HMACSHA256(Encoding.ASCII.GetBytes(_settings.TokenSecret));
             var claims = new Dictionary<string, object?>();
 
             claims.Add("cveSistema", cveSistemas);
