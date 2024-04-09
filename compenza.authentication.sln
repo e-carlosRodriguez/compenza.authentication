@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{827D6F70-C960-4504-B909-D57CB7D76140}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "compenza.authentication.api", "compenza.authentication.api\compenza.authentication.api.csproj", "{442077C9-57F6-489D-9140-63AE0BE6E7DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "compenza.authentication.application", "compenza.authentication.application\compenza.authentication.application.csproj", "{C0B74BDC-7C0E-40BD-986E-6EA846AD413E}"
