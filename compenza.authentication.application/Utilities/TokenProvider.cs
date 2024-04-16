@@ -28,7 +28,7 @@ namespace compenza.authentication.application.Utilities
             claims.Add("eMail", emp.eMail);
             claims.Add("cvePerfil", emp.cvePerfil);
             claims.Add("cveEmpleado", emp.cveEmpleado);
-            claims.Add("AdminPortal", emp.bAdministrarPortal);
+            claims.Add("AdminPortal", emp.bAdministraPortal);
             claims.Add("lenguaje", emp.idioma == "1" ? "es" : "en");
             claims.Add("verDatosEmpleado", true);
             claims.Add("verNoticias", true);
@@ -39,8 +39,8 @@ namespace compenza.authentication.application.Utilities
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Claims = claims,
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(MAC.Key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddHours(24),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(MAC.Key), SecurityAlgorithms.HmacSha256Signature),
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);

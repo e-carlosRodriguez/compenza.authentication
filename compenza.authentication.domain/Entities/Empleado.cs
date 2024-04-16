@@ -12,7 +12,7 @@ namespace compenza.authentication.domain.Entities
         public int cveEmpleado { get; set; }
         public bool bActivo { get; set; }
         public string cambiarPassword { get; set; }
-        public bool bAdministrarPortal { get; set; }
+        public bool bAdministraPortal { get; set; }
         public bool bIngresaPortal { get; set; }
         public string idioma { get; set; }
         public int? cveClaveCova { get; set; }
