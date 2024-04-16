@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using compenza.authentication.application;
 using compenza.authentication.application.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var compenzaOriginPolicy = "CompenzaPortal";
@@ -12,6 +13,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: compenzaOriginPolicy, policy => {
+        policy.WithOrigins("*");
+        policy.WithMethods("*");
+        policy.WithHeaders("*");
+    });
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -24,34 +33,29 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("1qaz-2wsxx-2wxx-2sxxc-2sxwccd-2srdewfwe")),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Settings:TokenSecret").Value)),
         ValidateIssuer = false,
         ValidateAudience = false
     };
-});
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: compenzaOriginPolicy, policy => {
-        policy.AllowAnyOrigin();
-        policy.AllowAnyMethod();
-        policy.AllowAnyHeader();
-     });
 });
 
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 builder.Host.UseSerilog();
 
 var app = builder.Build();
+var local = app.Environment.IsDevelopment();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI( options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var iisRoute = "/ApiCompenza/swagger/v1/swagger.json";
+    var localRoute = "/swagger/v1/swagger.json";
+    options.SwaggerEndpoint( local ? localRoute : iisRoute ,"Authentication");
+});
 
-app.UseSerilogRequestLogging();
+app.UseCors(compenzaOriginPolicy);
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
