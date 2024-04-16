@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace compenza.authentication.domain.Configure
 {
-    public class Result
+    public class UserInfo
     {
-        public string Mensaje { get; set; }
-        public bool Res { get; set; } = true;
-        public object Objeto { get; set; }
-        public string? Redirect { get; set; }
-        public string Token{ get; set; }
         public int cvUsuario { get; set; }
         public bool AdministraPortal { get; set; }
     }
