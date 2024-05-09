@@ -15,5 +15,6 @@ namespace compenza.authentication.domain.Configure
         public string Token{ get; set; }
         public int cvUsuario { get; set; }
         public bool AdministraPortal { get; set; }
+        public string sNombre{ get; set; }
     }
 }

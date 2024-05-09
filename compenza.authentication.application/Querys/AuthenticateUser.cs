@@ -113,6 +113,7 @@ namespace compenza.authentication.application.Querys
 
                         await _loginRepository.AuditoriaProcesos((int)eProcesosMenu.PortalAclaraciones, (int)eAcciones.Login, dsEmpleado.cveUsuario);
                         var token = _tokenProvider.GetTokenAsync(dsEmpleado, claveSistema, nombreCliente.ValorString, permisos /*reglas de licencia*/);
+                        result.sNombre = dsEmpleado.Nombre;
                         result.Token = token;
 
                     }
