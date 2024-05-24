@@ -96,6 +96,7 @@ namespace compenza.authentication.application.Querys
                         var tienReglas = ValidarLicencia(licencia, empleados, usuarios, out result);
 
                         result.cvUsuario = dsEmpleado.cveUsuario;
+                        result.cvEmpleado = dsEmpleado.cveEmpleado;
                         result.AdministraPortal = dsEmpleado.bAdministraPortal;
                         result.Objeto = (int)eResultado.Redirect;
                         result.Mensaje = (tienReglas && (ValidarFamiliasRevisionResult > 0)) ? "Revision/Revision" : "/";
@@ -120,6 +121,7 @@ namespace compenza.authentication.application.Querys
                     else
                     {
                         result.cvUsuario = dsEmpleado.cveUsuario;
+                        result.cvEmpleado = dsEmpleado.cveEmpleado;
                         result.AdministraPortal = dsEmpleado.bAdministraPortal;
 
                         var procesoAcalaraciones = permisos.First(item => item.cveProceso == (int)eProcesosMenu.PortalAclaraciones);
