@@ -15,7 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: compenzaOriginPolicy, policy => {
+    options.AddPolicy(name: compenzaOriginPolicy, policy =>
+    {
         policy.WithOrigins("*");
         policy.WithMethods("*");
         policy.WithHeaders("*");
@@ -46,11 +47,11 @@ var app = builder.Build();
 var local = app.Environment.IsDevelopment();
 
 app.UseSwagger();
-app.UseSwaggerUI( options =>
+app.UseSwaggerUI(options =>
 {
     var iisRoute = "/ApiCompenza/swagger/v1/swagger.json";
     var localRoute = "/swagger/v1/swagger.json";
-    options.SwaggerEndpoint( local ? localRoute : iisRoute ,"Authentication");
+    options.SwaggerEndpoint(local ? localRoute : iisRoute, "Authentication");
 });
 
 app.UseCors(compenzaOriginPolicy);

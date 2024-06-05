@@ -9,7 +9,7 @@ namespace compenza.authentication.application
 {
     public static class ApplicationExtenssions
     {
-        public static IServiceCollection AddApplication( this IServiceCollection services, IConfiguration configuration )
+        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddPercistance(configuration);
 

@@ -8,9 +8,9 @@ namespace compenza.authentication.percistance
 {
     public static class PercistanceExtenssions
     {
-        public static IServiceCollection AddPercistance( this IServiceCollection services, IConfiguration configuration )
+        public static IServiceCollection AddPercistance(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<Settings>( configuration.GetSection("Settings") );
+            services.Configure<Settings>(configuration.GetSection("Settings"));
             services.AddTransient<ICompenzaDbContext, CompenzaDbContext>();
             services.AddTransient<ILoginRepository, LoginRepository>();
 

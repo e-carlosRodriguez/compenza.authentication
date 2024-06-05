@@ -6,6 +6,7 @@ using compenza.authentication.application.Querys;
 using compenza.authentication.api.Payloads.Request;
 using compenza.authentication.api.Payloads.Response;
 using compenza.authentication.application.Exceptions;
+using Newtonsoft.Json;
 
 namespace compenza.authentication.api.Controllers
 {
@@ -26,9 +27,33 @@ namespace compenza.authentication.api.Controllers
         {
             try
             {
-                var result = await _mediator.Send(new AuthenticateUser.Query(request.LoginName, request.Password, "", ""));
+                var strPath = HttpContext;
+
+                var result = await _mediator.Send(new AuthenticateUser.Query(request.LoginName, request.Password, "", "", strPath));
 
                 var apiResponse = new ApiResponse<Result>(result);
+                apiResponse.StatusCode = HttpStatusCode.OK;
+                apiResponse.Message = "Ok";
+
+                return Ok(apiResponse);
+            }
+            catch (HttpException e)
+            {
+                throw new HttpException(e.StatusCode, e.Message, e.Errors);
+            }
+        }
+
+        [HttpGet]
+        [Route("Servidor")]
+        public async Task<IActionResult> Servidor()
+        {
+            try
+            {
+                var request = HttpContext;
+
+                string strPath = request.Request.Host.Value + request.Request.Path.Value;
+
+                var apiResponse = new ApiResponse<Result>(new Result() { Mensaje = "Error", Objeto = strPath });
                 apiResponse.StatusCode = HttpStatusCode.OK;
                 apiResponse.Message = "Ok";
 
