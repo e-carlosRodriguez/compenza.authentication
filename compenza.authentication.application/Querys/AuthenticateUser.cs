@@ -42,7 +42,7 @@ namespace compenza.authentication.application.Querys
             {
                 var result = new Result();
 
-                string strPath = request.Context.Request.Host.Value + request.Context.Request.Path.Value;
+                string strPath = request.Context.Request.Host.Value + "/";
 
                 string ServerIDConfiguration = string.Empty;
 
