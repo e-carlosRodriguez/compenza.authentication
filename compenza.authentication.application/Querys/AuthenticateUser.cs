@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using System.Data;
 
 namespace compenza.authentication.application.Querys
 {
@@ -86,6 +87,20 @@ namespace compenza.authentication.application.Querys
                 var cvePerfil = Convert.ToInt32(dsEmpleado.cvePerfil);
                 var permisos = await _loginRepository.ListarPermisos(0, cvePerfil);
                 var proceso = ProcesoPortal(permisos);
+
+                var perfilProceso = new DataTable();
+
+                perfilProceso = await _loginRepository.PermisoPerfil(3, 0, cvePerfil);
+
+                var permisosPortal = PermisoPortal(perfilProceso) || cvePerfil == 0;
+
+                if (!permisosPortal)
+                {
+                    result.Mensaje = "msgSinPermisoaPortal";
+                    result.Objeto = (int)eTipoErrors.ModuloNoEncontrado;
+
+                    return result;
+                }
 
                 // Lógica para determinar el sistema clave
                 var claveSistema = DetermineClaveSistema(proceso);
@@ -329,6 +344,16 @@ namespace compenza.authentication.application.Querys
                 }
 
                 return result;
+            }
+
+            private bool PermisoPortal(DataTable perfilProceso)
+            {
+
+                bool permiso = perfilProceso.AsEnumerable().Any(x =>
+                    x.Field<int>("cveProceso") == (int)eProcesosMenu.PortalInicio
+                    || x.Field<int>("cveProceso") == (int)eProcesosMenu.PortalAclaraciones);
+
+                return permiso;
             }
 
         }

@@ -143,5 +143,24 @@ namespace compenza.authentication.percistance.Repository
                 return dt;
             }
         }
+
+        public async Task<DataTable> PermisoPerfil(int Accion, int proceso, int perfil)
+        {
+            using (var con = _compenzaDbContext.GetConeConnection())
+            {
+                var par = new DynamicParameters();
+                par.Add("@Accion", Accion);
+                par.Add("@Proceso", proceso);
+                par.Add("@Perfil", perfil);
+
+                var dt = new DataTable();
+
+                var res = await con.ExecuteReaderAsync("Compenza.uSP_Compenza_GetMenuPrincipal", par, commandType: CommandType.StoredProcedure);
+
+                dt.Load(res);
+
+                return dt;
+            }
+        }
     }
 }
