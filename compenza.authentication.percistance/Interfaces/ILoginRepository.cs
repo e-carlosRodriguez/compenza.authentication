@@ -16,5 +16,6 @@ namespace compenza.authentication.percistance.Interfaces
         Task<(int, int)> UsuarioEmpleadoActivos();
         Task<(int, int)> UsuarioEmpleadoActivosTotal();
         Task<DataTable> BaseDeDatosId();
+        Task<DataTable> PermisoPerfil(int Accion, int proceso, int perfil);
     }
 }
