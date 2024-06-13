@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Licencia\License\License.csproj" />
     <ProjectReference Include="..\compenza.authentication.application\compenza.authentication.application.csproj" />
   </ItemGroup>
 

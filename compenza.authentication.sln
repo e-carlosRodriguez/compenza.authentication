@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "compenza.authentication.dom
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "compenza.authentication.percistance", "compenza.authentication.percistance\compenza.authentication.percistance.csproj", "{957DC7A3-3EA5-4F4C-B85C-8AB9D9D3DE7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "License", "..\Licencia\License\License.csproj", "{B8BF31D0-7526-46DF-9F14-90487A2B6BFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "License", "..\..\Licencia\License\License.csproj", "{B8BF31D0-7526-46DF-9F14-90487A2B6BFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
