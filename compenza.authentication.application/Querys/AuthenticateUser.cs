@@ -241,7 +241,7 @@ namespace compenza.authentication.application.Querys
 
                 if (!tienReglas && !TieneMesajesResult.Res)
                 {
-                    result.Mensaje = "/";
+                    result.Mensaje = "/home";
                 }
 
                 await _loginRepository.AuditoriaProcesos((int)eProcesosMenu.PortalAclaraciones, (int)eAcciones.Login, dsEmpleado.cveUsuario);
@@ -261,7 +261,7 @@ namespace compenza.authentication.application.Querys
                 if (result > 0)
                 {
                     response.Objeto = (int)eResultado.Redirect;
-                    response.Mensaje = "/home/mensajes/administrar";
+                    response.Mensaje = "/mensajes/administrar";
 
                     return response;
                 }
