@@ -231,7 +231,7 @@ namespace compenza.authentication.application.Querys
                 result.cvEmpleado = dsEmpleado.cveEmpleado;
                 result.AdministraPortal = dsEmpleado.bAdministraPortal;
                 result.Objeto = (int)eResultado.Redirect;
-                result.Mensaje = (tienReglas && ((int)ValidarFamiliasRevision.FirstOrDefault() > 0)) ? "Revision/Revision" : "/";
+                result.Mensaje = (tienReglas && ((int)ValidarFamiliasRevision.FirstOrDefault() > 0)) ? "Revision/Revision" : "/home";
 
                 if (TieneMesajesResult is not null && TieneMesajesResult.Res)
                 {
