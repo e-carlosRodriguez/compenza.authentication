@@ -261,7 +261,7 @@ namespace compenza.authentication.application.Querys
                 if (result > 0)
                 {
                     response.Objeto = (int)eResultado.Redirect;
-                    response.Mensaje = "/mensajes/administrar";
+                    response.Mensaje = "/home/mensajes/administrar";
 
                     return response;
                 }
