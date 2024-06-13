@@ -6,6 +6,8 @@ using compenza.authentication.application.Querys;
 using compenza.authentication.api.Payloads.Request;
 using compenza.authentication.api.Payloads.Response;
 using compenza.authentication.application.Exceptions;
+using Newtonsoft.Json;
+using compenza.authentication.application.Utilities;
 
 namespace compenza.authentication.api.Controllers
 {
@@ -26,7 +28,9 @@ namespace compenza.authentication.api.Controllers
         {
             try
             {
-                var result = await _mediator.Send(new AuthenticateUser.Query(request.LoginName, request.Password, "", ""));
+                var strPath = HttpContext;
+
+                var result = await _mediator.Send(new AuthenticateUser.Query(request.LoginName, request.Password, "", "", strPath));
 
                 var apiResponse = new ApiResponse<Result>(result);
                 apiResponse.StatusCode = HttpStatusCode.OK;
