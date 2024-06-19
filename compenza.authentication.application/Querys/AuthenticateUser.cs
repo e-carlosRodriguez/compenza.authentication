@@ -271,7 +271,7 @@ namespace compenza.authentication.application.Querys
                 return response;
             }
 
-            private bool ValidarLicencia(License.Parameters license, int empleados, int usuarios, int empleadosTotal, int usuarioTotal, out Result result)
+            public bool ValidarLicencia(License.Parameters license, int empleados, int usuarios, int empleadosTotal, int usuarioTotal, out Result result)
             {
                 var isValidLicence = true;
 

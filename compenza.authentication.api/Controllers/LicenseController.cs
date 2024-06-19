@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using compenza.authentication.application.Exceptions;
+using compenza.authentication.application.Querys;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Reflection;
 
@@ -9,6 +12,13 @@ namespace compenza.authentication.api.Controllers
     public class LicenseController : ControllerBase
     {
         private const string fileName = "License.dll";
+
+        private readonly IMediator _mediator;
+
+        public LicenseController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         [HttpGet]
         public ActionResult GetLicense()
@@ -79,6 +89,7 @@ namespace compenza.authentication.api.Controllers
 
             try
             {
+                var strPath = HttpContext;
                 byte[] dllbytes = null;
 
                 using (var memorystream = new MemoryStream())
@@ -100,6 +111,9 @@ namespace compenza.authentication.api.Controllers
 
                 #region ValidacionesPrevioAAgregarNuevaLicencia
                 //usar este espacio por si es necesario agregar alguna regla o validacion antes de eliminar o agregar una nueva licencia
+                var isValidLicense = await _mediator.Send( new VlidateLicenseBeforeUploading.Query(strPath) );
+                if ( !isValidLicense.Res )
+                return BadRequest( isValidLicense );
                 #endregion
 
                 var location = Assembly.GetExecutingAssembly().Location;
@@ -127,6 +141,20 @@ namespace compenza.authentication.api.Controllers
             }
 
             return Ok("Licencia cargada exitosamente.");
+        }
+
+        [HttpGet]
+        [Route(nameof(ObtenerReglas))]
+        public async Task<IActionResult> ObtenerReglas()
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (HttpException e)
+            {
+                throw new HttpException(e.StatusCode, e.Message, e.Errors);
+            }
         }
     }
 }
