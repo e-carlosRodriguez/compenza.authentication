@@ -1,5 +1,8 @@
-﻿using compenza.authentication.application.Exceptions;
+﻿using compenza.authentication.api.Payloads.Request;
+using compenza.authentication.api.Payloads.Response;
+using compenza.authentication.application.Exceptions;
 using compenza.authentication.application.Querys;
+using compenza.authentication.domain.Configure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -143,13 +146,16 @@ namespace compenza.authentication.api.Controllers
             return Ok("Licencia cargada exitosamente.");
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(nameof(ObtenerReglas))]
-        public async Task<IActionResult> ObtenerReglas()
+        public async Task<IActionResult> ObtenerReglas([FromBody] ObtenerPermisosRequest request)
         {
             try
             {
-                return Ok();
+                var result = await _mediator.Send( new CargarPermisosPorCveProceso.Query( request.CveProceso, request.CvePerfil, request.CveUsuario ) );
+                var apiResponse = new ApiResponse<Result>(result);
+
+                return Ok(apiResponse);
             }
             catch (HttpException e)
             {
