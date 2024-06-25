@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace compenza.authentication.application.Querys
 {
-    public class VlidateLicenseBeforeUploading
+    public class ValidateLicenseBeforeUploading
     {
         public record Query(HttpContext Context) : IRequest<Result>;
 
@@ -67,6 +67,9 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgServidorInvalido";
                     result.Objeto = (int)eTipoErrors.ErrorArchivo;
+                    result.DBServerMessage = $"ID: {license.BDServerID}";
+                    result.ServerMessage = $"ID: {license.ServerID}";
+
 
                     return result;
                 }
