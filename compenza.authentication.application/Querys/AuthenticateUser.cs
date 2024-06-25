@@ -285,6 +285,11 @@ namespace compenza.authentication.application.Querys
                     result.Mensaje = "msgLicenciaInvalida";
                     result.Objeto = isValidLicence ? "" : (int)eResultado.ErrorLicencia;
                 }
+                else if (((int)(DateTime.Now - license.FechaLicencia).TotalDays) == 5)
+                {
+                    result.Mensaje = "msgAlertaLicencia";
+                    isValidLicence = false;
+                }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {
                     result.Mensaje = "msgLicenciaExpirada";

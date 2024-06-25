@@ -114,7 +114,7 @@ namespace compenza.authentication.api.Controllers
 
                 #region ValidacionesPrevioAAgregarNuevaLicencia
                 //usar este espacio por si es necesario agregar alguna regla o validacion antes de eliminar o agregar una nueva licencia
-                var isValidLicense = await _mediator.Send( new VlidateLicenseBeforeUploading.Query(strPath) );
+                var isValidLicense = await _mediator.Send( new ValidateLicenseBeforeUploading.Query(strPath) );
                 if ( !isValidLicense.Res )
                 return BadRequest( isValidLicense );
                 #endregion
@@ -162,5 +162,25 @@ namespace compenza.authentication.api.Controllers
                 throw new HttpException(e.StatusCode, e.Message, e.Errors);
             }
         }
+
+        [HttpGet(nameof(ValidarLicencia))]
+        public async Task<IActionResult> ValidarLicencia()
+        {
+            try
+            {
+                var strPath = HttpContext;
+                var result = await _mediator.Send( new ValidateLicenseBeforeUploading.Query(strPath));
+                if (!result.Res)
+                    return BadRequest(result);
+
+                return Ok(result);
+
+            }
+            catch (HttpException e)
+            {
+                throw new HttpException(e.StatusCode, e.Message, e.Errors);
+            }
+        }
+        
     }
 }
