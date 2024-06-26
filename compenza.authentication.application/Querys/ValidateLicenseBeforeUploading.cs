@@ -55,6 +55,7 @@ namespace compenza.authentication.application.Querys
 
                 PropertiesConfig _propertiesConfig = new PropertiesConfig();
                 var result = new Result();
+                var diasTolerancia = ((int)(DateTime.Now - license.FechaLicencia).TotalDays);
 
                 if (license is null)
                 {
@@ -73,7 +74,7 @@ namespace compenza.authentication.application.Querys
 
                     return result;
                 }
-                else if (((int)(DateTime.Now - license.FechaLicencia).TotalDays) == 5)
+                else if (diasTolerancia <= license.Alerta)
                 {
                     result.Mensaje = "msgAlertaLicencia";
                     result.Res = false;
