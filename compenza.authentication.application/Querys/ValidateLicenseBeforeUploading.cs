@@ -61,6 +61,7 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgLicenciaInvalida";
                     result.Objeto = (int)eResultado.ErrorLicencia;
+                    result.Res = false;
 
                     return result;
                 }
@@ -70,6 +71,7 @@ namespace compenza.authentication.application.Querys
                     result.Objeto = (int)eTipoErrors.ErrorArchivo;
                     result.DBServerMessage = $"ID: {license.BDServerID}";
                     result.ServerMessage = $"ID: {license.ServerID}";
+                    result.Res = false;
 
 
                     return result;
@@ -77,6 +79,7 @@ namespace compenza.authentication.application.Querys
                 else if (diasTolerancia <= license.Alerta)
                 {
                     result.Mensaje = "msgAlertaLicencia";
+                    result.Objeto = diasTolerancia;
                     result.Res = false;
 
                     return result;
