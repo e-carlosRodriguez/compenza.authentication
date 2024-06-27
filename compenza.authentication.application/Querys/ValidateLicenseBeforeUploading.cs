@@ -56,6 +56,7 @@ namespace compenza.authentication.application.Querys
                 PropertiesConfig _propertiesConfig = new PropertiesConfig();
                 var result = new Result();
                 var diasTolerancia = license.FechaLicencia.Subtract(DateTime.Now).Days;
+                var diasExpiracion =  DateTime.Now.Subtract(license.FechaLicencia).Days;
 
                 if (license is null)
                 {
@@ -84,7 +85,7 @@ namespace compenza.authentication.application.Querys
 
                     return result;
                 }
-                else if(DateTime.Now >= license.FechaLicencia)
+                else if(DateTime.Now >= license.FechaLicencia && diasExpiracion <= license.Expira)
                 {
                     result.Mensaje = "msgAlertaLicenciaCaducado";
                     result.Res = false;
