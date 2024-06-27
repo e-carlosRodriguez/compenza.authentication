@@ -85,9 +85,13 @@ namespace compenza.authentication.api.Controllers
         [HttpPost(Name = "Upload")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
+            
             if (file == null || file.Length == 0 || file.FileName != fileName)
             {
-                return BadRequest("Archivo no cargado.");
+                return BadRequest(new
+                {
+                    mensaje = "Archivo no cargado."
+                });
             }
 
             try
@@ -109,14 +113,20 @@ namespace compenza.authentication.api.Controllers
 
                 if (type is null || obj is null || method is null)
                 {
-                    return BadRequest("Licencia Invalida");
+                    return BadRequest(new
+                    {
+                        mensaje = "Licencia Invalida",                     
+                    });
                 }
 
                 #region ValidacionesPrevioAAgregarNuevaLicencia
                 //usar este espacio por si es necesario agregar alguna regla o validacion antes de eliminar o agregar una nueva licencia
                 var isValidLicense = await _mediator.Send( new ValidateLicenseBeforeUploading.Query(strPath) );
                 if ( !isValidLicense.Res )
-                return BadRequest( isValidLicense );
+                return BadRequest( new
+                {
+                    mensaje = isValidLicense
+                });
                 #endregion
 
                 var location = Assembly.GetExecutingAssembly().Location;
@@ -143,7 +153,10 @@ namespace compenza.authentication.api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"{ex.Message}");
             }
 
-            return Ok("Licencia cargada exitosamente.");
+            return Ok(new
+            {
+                mensaje = "Licencia cargada exitosamente."
+            });
         }
 
         [HttpPost]
