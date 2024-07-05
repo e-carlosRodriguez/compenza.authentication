@@ -4,6 +4,7 @@ using compenza.authentication.domain.Configure;
 using compenza.authentication.percistance.Interfaces;
 using compenza.authentication.application.Utilities;
 using Microsoft.AspNetCore.Http;
+using System.Data;
 
 namespace compenza.authentication.application.Querys
 {
@@ -130,6 +131,29 @@ namespace compenza.authentication.application.Querys
                 }
 
                 return result;
+            }
+        }
+    }
+
+    public class ObtenerConfiguracionesPorId
+    {
+        public record Query(int Accion, int configuracionFotos) : IRequest<DataSet>;
+
+        public class Handler : IRequestHandler<Query, DataSet>
+        {
+
+            private readonly ILoginRepository _iLoginRepository;
+
+            public Handler(ILoginRepository iLoginRepository)
+            {
+                _iLoginRepository = iLoginRepository ?? throw new ArgumentException(nameof(iLoginRepository));
+            }
+
+            public async Task<DataSet> Handle(Query query, CancellationToken cancellationToken)
+            {
+                var Path = await _iLoginRepository.ObtenerConfiguracionesPorId(query.Accion, query.configuracionFotos);
+
+                return Path;
             }
         }
     }
