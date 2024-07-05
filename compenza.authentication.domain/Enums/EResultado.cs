@@ -37,6 +37,7 @@ namespace compenza.authentication.domain.Enums
 
     public enum eAcciones
     {
-        Login = 6
+        Login = 6,
+        AbrirPantalla = 7,
     }
 }

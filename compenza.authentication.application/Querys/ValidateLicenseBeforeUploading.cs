@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using compenza.authentication.domain.Enums;
 using compenza.authentication.domain.Configure;
 using compenza.authentication.percistance.Interfaces;
@@ -90,6 +90,8 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgAlertaLicenciaCaducado";
                     result.Res = true;
+
+                    return result;
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {

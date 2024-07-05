@@ -17,5 +17,7 @@ namespace compenza.authentication.domain.Configure
         public int cvEmpleado { get; set; }
         public bool AdministraPortal { get; set; }
         public string sNombre{ get; set; }
+        public string? ServerMessage { get; set; }
+        public string? DBServerMessage { get; set; }
     }
 }

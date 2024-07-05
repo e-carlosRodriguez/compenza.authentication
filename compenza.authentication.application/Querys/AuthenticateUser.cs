@@ -3,7 +3,6 @@ using compenza.authentication.domain.Configure;
 using compenza.authentication.domain.Entities;
 using compenza.authentication.domain.Enums;
 using compenza.authentication.percistance.Interfaces;
-using License;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -60,7 +59,9 @@ namespace compenza.authentication.application.Querys
 
                 var BDServerIDConfiguration = Encripta.EncriptarCadena(String.Format("{0}\\{1}\\{2}", CPU, server, version));
 
-                int validarServer = PropertiesConfig.ValidarServer(BDServerIDConfiguration, ServerIDConfiguration);
+                PropertiesConfig propertiesConfig = new PropertiesConfig();
+
+                int validarServer = await propertiesConfig.ValidarServer(BDServerIDConfiguration, ServerIDConfiguration);
 
                 if (validarServer == (int)eTipoErrors.ErrorArchivo)
                 {
@@ -224,14 +225,16 @@ namespace compenza.authentication.application.Querys
                 var (empleados, usuarios) = UsuarioEmpleadoActivos;
                 var (empleadosTotal, usuariosTotal) = UsuarioEmpleadoActivosTotal;
 
-                var licencia = License.PropertiesConfig.Information();
-                var tienReglas = ValidarLicencia(licencia, empleados, usuarios, empleadosTotal, usuariosTotal, out result);
+                PropertiesConfig propertiesConfig = new PropertiesConfig();
+
+                var licencia = await propertiesConfig.Information();
+                var tienReglas = ValidarLicencia(licencia, empleados, usuarios, empleadosTotal, usuariosTotal, result);
 
                 result.cvUsuario = dsEmpleado.cveUsuario;
                 result.cvEmpleado = dsEmpleado.cveEmpleado;
                 result.AdministraPortal = dsEmpleado.bAdministraPortal;
                 result.Objeto = (int)eResultado.Redirect;
-                result.Mensaje = (tienReglas && ((int)ValidarFamiliasRevision.FirstOrDefault() > 0)) ? "Revision/Revision" : "/";
+                result.Mensaje = (await tienReglas && ((int)ValidarFamiliasRevision.FirstOrDefault() > 0)) ? "Revision/Revision" : "/home";
 
                 if (TieneMesajesResult is not null && TieneMesajesResult.Res)
                 {
@@ -239,9 +242,9 @@ namespace compenza.authentication.application.Querys
                     result.Mensaje = TieneMesajesResult.Mensaje;
                 }
 
-                if (!tienReglas && !TieneMesajesResult.Res)
+                if (!await tienReglas && !TieneMesajesResult.Res)
                 {
-                    result.Mensaje = "/";
+                    result.Mensaje = "/home";
                 }
 
                 await _loginRepository.AuditoriaProcesos((int)eProcesosMenu.PortalAclaraciones, (int)eAcciones.Login, dsEmpleado.cveUsuario);
@@ -261,7 +264,7 @@ namespace compenza.authentication.application.Querys
                 if (result > 0)
                 {
                     response.Objeto = (int)eResultado.Redirect;
-                    response.Mensaje = "Mensajes/Mensajes";
+                    response.Mensaje = "/home/mensajes/administrar";
 
                     return response;
                 }
@@ -271,7 +274,7 @@ namespace compenza.authentication.application.Querys
                 return response;
             }
 
-            private bool ValidarLicencia(License.Parameters license, int empleados, int usuarios, int empleadosTotal, int usuarioTotal, out Result result)
+            public async Task<bool> ValidarLicencia(Parameters license, int empleados, int usuarios, int empleadosTotal, int usuarioTotal, Result result)
             {
                 var isValidLicence = true;
 
@@ -284,6 +287,11 @@ namespace compenza.authentication.application.Querys
                     isValidLicence = false;
                     result.Mensaje = "msgLicenciaInvalida";
                     result.Objeto = isValidLicence ? "" : (int)eResultado.ErrorLicencia;
+                }
+                else if (((int)(DateTime.Now - license.FechaLicencia).TotalDays) == 5)
+                {
+                    result.Mensaje = "msgAlertaLicencia";
+                    isValidLicence = false;
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {
@@ -300,12 +308,12 @@ namespace compenza.authentication.application.Querys
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     isValidLicence = false;
                 }
-                else if (_propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
+                else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     isValidLicence = false;
                 }
-                else if (_propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
+                else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     isValidLicence = false;

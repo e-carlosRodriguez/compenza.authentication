@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using compenza.authentication.domain.Configure;
 using compenza.authentication.percistance.Interfaces;
 using compenza.authentication.percistance.Repository;
+using compenza.authentication.api.Controllers;
 
 namespace compenza.authentication.percistance
 {
@@ -13,6 +14,7 @@ namespace compenza.authentication.percistance
             services.Configure<Settings>(configuration.GetSection("Settings"));
             services.AddTransient<ICompenzaDbContext, CompenzaDbContext>();
             services.AddTransient<ILoginRepository, LoginRepository>();
+            services.AddTransient<IProcesosRepository, PerfilProcesoRepository>();
 
             return services;
         }
