@@ -6,8 +6,6 @@ using compenza.authentication.application.Querys;
 using compenza.authentication.api.Payloads.Request;
 using compenza.authentication.api.Payloads.Response;
 using compenza.authentication.application.Exceptions;
-using Newtonsoft.Json;
-using compenza.authentication.application.Utilities;
 
 namespace compenza.authentication.api.Controllers
 {

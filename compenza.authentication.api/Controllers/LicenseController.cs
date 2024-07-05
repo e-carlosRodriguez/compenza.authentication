@@ -6,6 +6,7 @@ using compenza.authentication.domain.Configure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Data.SqlTypes;
 using System.Reflection;
 
 namespace compenza.authentication.api.Controllers
@@ -85,7 +86,12 @@ namespace compenza.authentication.api.Controllers
         [HttpPost(Name = "Upload")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            
+            var strPath = HttpContext;
+
+            byte[] dllbytes = null;
+
+            var dllpath = string.Empty;
+
             if (file == null || file.Length == 0 || file.FileName != fileName)
             {
                 return BadRequest(new
@@ -96,44 +102,9 @@ namespace compenza.authentication.api.Controllers
 
             try
             {
-                var strPath = HttpContext;
-                byte[] dllbytes = null;
-
-                using (var memorystream = new MemoryStream())
-                {
-                    await file.CopyToAsync(memorystream);
-                    dllbytes = memorystream.ToArray();
-                }
-
-                Assembly loadAssembly = Assembly.Load(dllbytes);
-
-                Type type = loadAssembly.GetType("License.PropertiesConfig");
-                object obj = Activator.CreateInstance(type);
-                MethodInfo method = type.GetMethod("Information");
-
-                if (type is null || obj is null || method is null)
-                {
-                    return BadRequest(new
-                    {
-                        mensaje = "Licencia Invalida",                     
-                    });
-                }
-
-                #region ValidacionesPrevioAAgregarNuevaLicencia
-                //usar este espacio por si es necesario agregar alguna regla o validacion antes de eliminar o agregar una nueva licencia
-                var isValidLicense = await _mediator.Send( new ValidateLicenseBeforeUploading.Query(strPath) );
-                if ( !isValidLicense.Res )
-                return BadRequest( new
-                {
-                    mensaje = isValidLicense
-                });
-                #endregion
-
                 var location = Assembly.GetExecutingAssembly().Location;
 
                 var directorypath = Path.GetDirectoryName(location);
-
-                var dllpath = string.Empty;
 
                 dllpath = Path.Combine(directorypath, "License.dll");
 
@@ -146,11 +117,33 @@ namespace compenza.authentication.api.Controllers
                 {
                     await file.CopyToAsync(filestream);
                 }
-
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"{ex.Message}");
+            }
+            finally
+            {
+                if (dllbytes != null)
+                {
+                    Array.Clear(dllbytes, 0, dllbytes.Length);
+                    dllbytes = null;
+                }
+            }
+
+            #region ValidacionesPrevioAAgregarNuevaLicencia
+            //usar este espacio por si es necesario agregar alguna regla o validacion antes de eliminar o agregar una nueva licencia
+            var isValidLicense = await _mediator.Send(new ValidateLicenseBeforeUploading.Query(strPath));
+            #endregion
+
+            if (!isValidLicense.Res)
+            {
+                System.IO.File.Delete(dllpath);
+
+                return BadRequest(new
+                {
+                    mensaje = isValidLicense
+                });
             }
 
             return Ok(new
@@ -165,7 +158,7 @@ namespace compenza.authentication.api.Controllers
         {
             try
             {
-                var result = await _mediator.Send( new CargarPermisosPorCveProceso.Query( request.CveProceso, request.CvePerfil, request.CveUsuario ) );
+                var result = await _mediator.Send(new CargarPermisosPorCveProceso.Query(request.CveProceso, request.CvePerfil, request.CveUsuario));
                 var apiResponse = new ApiResponse<Result>(result);
 
                 return Ok(apiResponse);
@@ -182,7 +175,7 @@ namespace compenza.authentication.api.Controllers
             try
             {
                 var strPath = HttpContext;
-                var result = await _mediator.Send( new ValidateLicenseBeforeUploading.Query(strPath));
+                var result = await _mediator.Send(new ValidateLicenseBeforeUploading.Query(strPath));
                 if (!result.Res)
                     return BadRequest(result);
 
@@ -194,6 +187,6 @@ namespace compenza.authentication.api.Controllers
                 throw new HttpException(e.StatusCode, e.Message, e.Errors);
             }
         }
-        
+
     }
 }

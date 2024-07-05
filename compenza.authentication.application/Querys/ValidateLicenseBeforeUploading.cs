@@ -1,4 +1,3 @@
-﻿using License;
 using MediatR;
 using compenza.authentication.domain.Enums;
 using compenza.authentication.domain.Configure;
@@ -23,10 +22,12 @@ namespace compenza.authentication.application.Querys
 
             public async Task<Result> Handle(Query request, CancellationToken cancellationToken)
             {
-                var ( Empleados, usuarios ) = await _loginRepository.UsuarioEmpleadoActivos();
-                var ( EmpleadosTotal, UsuariosTotal) = await _loginRepository.UsuarioEmpleadoActivosTotal();
+                var (Empleados, usuarios) = await _loginRepository.UsuarioEmpleadoActivos();
+                var (EmpleadosTotal, UsuariosTotal) = await _loginRepository.UsuarioEmpleadoActivosTotal();
 
-                var LicenseResult = License.PropertiesConfig.Information();
+                PropertiesConfig propertiesConfig = new PropertiesConfig();
+
+                Parameters LicenseResult = await propertiesConfig.Information();
 
                 string strPath = request.Context.Request.Host.Value + "/";
                 string ServerIDConfiguration = string.Empty;
@@ -44,19 +45,19 @@ namespace compenza.authentication.application.Querys
 
                 var BDServerIDConfiguration = Encripta.EncriptarCadena(String.Format("{0}\\{1}\\{2}", CPU, server, version));
 
-                int validarServer = PropertiesConfig.ValidarServer(BDServerIDConfiguration, ServerIDConfiguration);
-                var isVlidResult = ValidarLicencia( LicenseResult, Empleados, usuarios, EmpleadosTotal, UsuariosTotal, validarServer);
+                int validarServer = await propertiesConfig.ValidarServer(BDServerIDConfiguration, ServerIDConfiguration);
+                var isVlidResult = await ValidarLicencia(LicenseResult, Empleados, usuarios, EmpleadosTotal, UsuariosTotal, validarServer);
 
                 return isVlidResult;
             }
 
-            public Result ValidarLicencia(License.Parameters license, int empleados, int usuarios, int empleadosTotal, int usuarioTotal, int validarServer)
+            public async Task<Result> ValidarLicencia(Parameters license, int empleados, int usuarios, int empleadosTotal, int usuarioTotal, int validarServer)
             {
-
                 PropertiesConfig _propertiesConfig = new PropertiesConfig();
+
                 var result = new Result();
                 var diasTolerancia = license.FechaLicencia.Subtract(DateTime.Now).Days;
-                var diasExpiracion =  DateTime.Now.Subtract(license.FechaLicencia).Days;
+                var diasExpiracion = DateTime.Now.Subtract(license.FechaLicencia).Days;
 
                 if (license is null)
                 {
@@ -81,14 +82,16 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgAlertaLicencia";
                     result.Objeto = diasTolerancia;
-                    result.Res = false;
+                    result.Res = true;
 
                     return result;
                 }
-                else if(DateTime.Now >= license.FechaLicencia && diasExpiracion <= license.Expira)
+                else if (DateTime.Now >= license.FechaLicencia && diasExpiracion <= license.Expira)
                 {
                     result.Mensaje = "msgAlertaLicenciaCaducado";
-                    result.Res = false;
+                    result.Res = true;
+
+                    return result;
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {
@@ -111,14 +114,14 @@ namespace compenza.authentication.application.Querys
 
                     return result;
                 }
-                else if (_propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
+                else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     result.Res = false;
 
                     return result;
                 }
-                else if (_propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
+                else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     result.Res = false;
@@ -128,7 +131,6 @@ namespace compenza.authentication.application.Querys
 
                 return result;
             }
-
         }
     }
 }

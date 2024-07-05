@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Licencia\License\License.csproj" />
     <ProjectReference Include="..\compenza.authentication.percistance\compenza.authentication.percistance.csproj" />
   </ItemGroup>
 
