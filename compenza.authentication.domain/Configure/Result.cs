@@ -12,12 +12,14 @@ namespace compenza.authentication.domain.Configure
         public bool Res { get; set; } = true;
         public object Objeto { get; set; }
         public string? Redirect { get; set; }
-        public string Token{ get; set; }
+        public string Token { get; set; }
         public int cvUsuario { get; set; }
         public int cvEmpleado { get; set; }
         public bool AdministraPortal { get; set; }
-        public string sNombre{ get; set; }
+        public string sNombre { get; set; }
         public string? ServerMessage { get; set; }
         public string? DBServerMessage { get; set; }
+
+        public string? LogoCompenza { get; set; }
     }
 }

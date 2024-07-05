@@ -6,6 +6,7 @@ using compenza.authentication.domain.Configure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Data;
 using System.Data.SqlTypes;
 using System.Reflection;
 
@@ -179,6 +180,15 @@ namespace compenza.authentication.api.Controllers
                 if (!result.Res)
                     return BadRequest(result);
 
+                DataSet LogoCompenza = await _mediator.Send(new ObtenerConfiguracionesPorId.Query(4, 20));
+
+                if (LogoCompenza.Tables.Count > 0 && LogoCompenza.Tables[0].Rows.Count > 0)
+                {
+                    string logoCompenza = LogoCompenza.Tables[0].Rows[0]["ValorString"].ToString();
+
+                    result.LogoCompenza = logoCompenza;
+                }
+
                 return Ok(result);
 
             }
@@ -187,6 +197,5 @@ namespace compenza.authentication.api.Controllers
                 throw new HttpException(e.StatusCode, e.Message, e.Errors);
             }
         }
-
     }
 }

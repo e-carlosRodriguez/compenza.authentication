@@ -162,5 +162,29 @@ namespace compenza.authentication.percistance.Repository
                 return dt;
             }
         }
+
+        public async Task<DataSet> ObtenerConfiguracionesPorId(int Accion, int configuracionFotos)
+        {
+            using (var con = _compenzaDbContext.GetConeConnection())
+            {
+                var par = new DynamicParameters();
+
+                par.Add("@Accion", Accion);
+
+                par.Add("@cveConfiguracion", configuracionFotos);
+
+                var reader = await con.ExecuteReaderAsync("Portal.SP_Portal_Configuracion", par, commandType: CommandType.StoredProcedure);
+
+                DataTable dt = new DataTable();
+
+                DataSet ds = new DataSet();
+
+                dt.Load(reader);
+
+                ds.Tables.Add(dt);
+
+                return ds;
+            }
+        }
     }
 }
