@@ -189,6 +189,15 @@ namespace compenza.authentication.api.Controllers
                     result.LogoCompenza = logoCompenza;
                 }
 
+                DataSet ImagenBackgroundCompenza = await _mediator.Send(new ObtenerConfiguracionesPorId.Query(4, 21));
+
+                if (ImagenBackgroundCompenza.Tables.Count > 0 && ImagenBackgroundCompenza.Tables[0].Rows.Count > 0)
+                {
+                    string imagenBackgroundCompenza = ImagenBackgroundCompenza.Tables[0].Rows[0]["ValorString"].ToString();
+
+                    result.ImagenBackgroundCompenza = imagenBackgroundCompenza;
+                }
+
                 return Ok(result);
 
             }
