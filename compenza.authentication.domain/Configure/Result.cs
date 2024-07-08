@@ -19,7 +19,7 @@ namespace compenza.authentication.domain.Configure
         public string sNombre { get; set; }
         public string? ServerMessage { get; set; }
         public string? DBServerMessage { get; set; }
-
         public string? LogoCompenza { get; set; }
+        public string? ImagenBackgroundCompenza { get; set; }
     }
 }
