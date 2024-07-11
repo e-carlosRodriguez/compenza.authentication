@@ -29,8 +29,7 @@ namespace compenza.authentication.domain.Configure
 
                 if (!System.IO.File.Exists(dllpath))
                 {
-                    object errorDetails = new { AdditionalInfo = "Sin Licencia." };
-                    throw new HttpException(System.Net.HttpStatusCode.Locked, "Error Licencia invalida:", errorDetails);
+                    return new Parameters();
                 }
 
                 dllbytes = System.IO.File.ReadAllBytes(dllpath);
@@ -219,5 +218,8 @@ namespace compenza.authentication.domain.Configure
         ToleranciaEmpleados = 11,
         ToleranciaUsuarios = 12,
         SinCompenzaHistorico = 13,
+        LicenciaValida = 14,
+        ServidorInvalido = 15,
+        SinLicencia = 16
     }
 }

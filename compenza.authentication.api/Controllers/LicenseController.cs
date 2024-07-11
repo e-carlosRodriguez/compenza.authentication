@@ -6,8 +6,10 @@ using compenza.authentication.domain.Configure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlTypes;
+using System.Net;
 using System.Reflection;
 
 namespace compenza.authentication.api.Controllers
@@ -32,6 +34,8 @@ namespace compenza.authentication.api.Controllers
             var directorypath = Path.GetDirectoryName(location);
             var dllpath = string.Empty;
             byte[] dllbytes = null;
+            var result = new Result();
+            var apiResponse = new ApiResponse<Result>(result);
 
             try
             {
@@ -39,31 +43,31 @@ namespace compenza.authentication.api.Controllers
 
                 if (!System.IO.File.Exists(dllpath))
                 {
-                    return BadRequest("Sin Licencia");
+                    result.Mensaje = "Sin Licencia";
+                    result.Objeto = (int)eTipoErrors.SinLicencia;
+                    result.Res = false;
+                    apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                    apiResponse.Message = "Error";
+
+                    return Ok(apiResponse);
                 }
 
                 dllbytes = System.IO.File.ReadAllBytes(dllpath);
                 Assembly loadAssembly = Assembly.Load(dllbytes);
 
                 Type type = loadAssembly.GetType("License.PropertiesConfig");
-
-                if (type is null)
-                {
-                    return BadRequest("Licencia Invalida");
-                }
-
                 object obj = Activator.CreateInstance(type);
-
-                if (obj is null)
-                {
-                    return BadRequest("Licencia Invalida");
-                }
-
                 MethodInfo method = type.GetMethod("Information");
 
-                if (method is null)
+                if (type is null || obj is null || method is null)
                 {
-                    return BadRequest("Licencia Invalida");
+                    result.Mensaje = "Sin Licencia";
+                    result.Objeto = (int)eTipoErrors.ErrorArchivo;
+                    result.Res = false;
+                    apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                    apiResponse.Message = "Error";
+
+                    return BadRequest(apiResponse);
                 }
 
                 var res = method.Invoke(obj, Array.Empty<object>());
@@ -93,12 +97,19 @@ namespace compenza.authentication.api.Controllers
 
             var dllpath = string.Empty;
 
+            var result = new Result();
+
+            var apiResponse = new ApiResponse<Result>(result);
+
             if (file == null || file.Length == 0 || file.FileName != fileName)
             {
-                return BadRequest(new
-                {
-                    mensaje = "Archivo no cargado."
-                });
+                result.Mensaje = "Archivo no cargado.";
+                result.Objeto = (int)eTipoErrors.ErrorArchivo;
+                result.Res = false;
+                apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                apiResponse.Message = "Ok";
+
+                return Ok(apiResponse);
             }
 
             try
@@ -147,10 +158,14 @@ namespace compenza.authentication.api.Controllers
                 });
             }
 
-            return Ok(new
-            {
-                mensaje = "Licencia cargada exitosamente."
-            });
+            result.Mensaje = "Licencia cargada exitosamente.";
+            result.Objeto = (int)eTipoErrors.LicenciaValida;
+            result.Res = true;
+            apiResponse.StatusCode = HttpStatusCode.OK;
+            apiResponse.Message = "Ok";
+
+            return Ok(apiResponse);
+
         }
 
         [HttpPost]
@@ -177,8 +192,6 @@ namespace compenza.authentication.api.Controllers
             {
                 var strPath = HttpContext;
                 var result = await _mediator.Send(new ValidateLicenseBeforeUploading.Query(strPath));
-                if (!result.Res)
-                    return BadRequest(result);
 
                 DataSet LogoCompenza = await _mediator.Send(new ObtenerConfiguracionesPorId.Query(4, 20));
 
@@ -197,6 +210,9 @@ namespace compenza.authentication.api.Controllers
 
                     result.ImagenBackgroundCompenza = imagenBackgroundCompenza;
                 }
+
+                if (!result.Res)
+                    return BadRequest(result);
 
                 return Ok(result);
 
