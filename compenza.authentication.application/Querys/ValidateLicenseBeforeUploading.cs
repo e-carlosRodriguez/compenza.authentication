@@ -90,42 +90,42 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgAlertaLicenciaCaducado";
                     result.Res = true;
-
+                    result.Objeto = (int)eTipoErrors.LicenciaVencida;
                     return result;
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {
                     result.Mensaje = "msgLicenciaExpirada";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.LicenciaVencida;
                     return result;
                 }
                 else if (empleados > (license.Empleados + (license.Empleados * 0.3)))
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaEmpleados;
                     return result;
                 }
                 else if (usuarios > (license.Usuarios + (license.Usuarios * 0.3)))
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaUsuarios;
                     return result;
                 }
                 else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaEmpleados;
                     return result;
                 }
                 else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaUsuarios;
                     return result;
                 }
 
