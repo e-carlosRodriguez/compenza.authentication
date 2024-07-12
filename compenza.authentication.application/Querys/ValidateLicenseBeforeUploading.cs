@@ -71,18 +71,17 @@ namespace compenza.authentication.application.Querys
                 else if (validarServer == (int)eTipoErrors.ErrorArchivo)
                 {
                     result.Mensaje = "msgServidorInvalido";
-                    result.Objeto = (int)eTipoErrors.ErrorArchivo;
+                    result.Objeto = (int)eTipoErrors.ServidorInvalido;
                     result.DBServerMessage = $"ID: {license.BDServerID}";
                     result.ServerMessage = $"ID: {license.ServerID}";
                     result.Res = false;
-
 
                     return result;
                 }
                 else if (diasTolerancia <= license.Alerta && diasTolerancia is not < 0)
                 {
-                    result.Mensaje = "msgAlertaLicencia";
-                    result.Objeto = diasTolerancia;
+                    result.Mensaje = diasTolerancia.ToString();
+                    result.Objeto = (int)eTipoErrors.LicenciasAlertas;
                     result.Res = true;
 
                     return result;
