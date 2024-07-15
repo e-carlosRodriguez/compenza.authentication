@@ -6,9 +6,7 @@ using compenza.authentication.domain.Configure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.ComponentModel;
 using System.Data;
-using System.Data.SqlTypes;
 using System.Net;
 using System.Reflection;
 
@@ -148,14 +146,35 @@ namespace compenza.authentication.api.Controllers
             var isValidLicense = await _mediator.Send(new ValidateLicenseBeforeUploading.Query(strPath));
             #endregion
 
+            DataSet LogoCompenza = await _mediator.Send(new ObtenerConfiguracionesPorId.Query(4, 20));
+
+            if (LogoCompenza.Tables.Count > 0 && LogoCompenza.Tables[0].Rows.Count > 0)
+            {
+                string logoCompenza = LogoCompenza.Tables[0].Rows[0]["ValorString"].ToString();
+
+                result.LogoCompenza = logoCompenza;
+            }
+
+            DataSet ImagenBackgroundCompenza = await _mediator.Send(new ObtenerConfiguracionesPorId.Query(4, 21));
+
+            if (ImagenBackgroundCompenza.Tables.Count > 0 && ImagenBackgroundCompenza.Tables[0].Rows.Count > 0)
+            {
+                string imagenBackgroundCompenza = ImagenBackgroundCompenza.Tables[0].Rows[0]["ValorString"].ToString();
+
+                result.ImagenBackgroundCompenza = imagenBackgroundCompenza;
+            }
+
             if (!isValidLicense.Res)
             {
                 System.IO.File.Delete(dllpath);
 
-                return BadRequest(new
-                {
-                    mensaje = isValidLicense
-                });
+                result.Mensaje = "Licencia invalida.";
+                result.Objeto = (int)eTipoErrors.ErrorArchivo;
+                result.Res = false;
+                apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                apiResponse.Message = "Error";
+
+                return Ok(apiResponse);
             }
 
             result.Mensaje = "Licencia cargada exitosamente.";

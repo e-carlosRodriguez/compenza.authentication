@@ -59,6 +59,12 @@ namespace compenza.authentication.application.Querys
                 var result = new Result();
                 var diasTolerancia = license.FechaLicencia.Subtract(DateTime.Now).Days;
                 var diasExpiracion = DateTime.Now.Subtract(license.FechaLicencia).Days;
+                result.Actualizarlicencia = false;
+
+                if (DateTime.Now >= license.FechaLicencia && diasExpiracion <= license.Expira)
+                {
+                    result.Actualizarlicencia = true;
+                }
 
                 if (license is null)
                 {
@@ -72,8 +78,8 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgServidorInvalido";
                     result.Objeto = (int)eTipoErrors.ServidorInvalido;
-                    result.DBServerMessage = $"ID: {license.BDServerID}";
-                    result.ServerMessage = $"ID: {license.ServerID}";
+                    result.DBServerMessage = license.BDServerID == "" ? null : $"ID: {license.BDServerID}";
+                    result.ServerMessage = license.BDServerID == "" ? null : $"ID: {license.ServerID}";
                     result.Res = false;
 
                     return result;
@@ -88,44 +94,44 @@ namespace compenza.authentication.application.Querys
                 }
                 else if (DateTime.Now >= license.FechaLicencia && diasExpiracion <= license.Expira)
                 {
-                    result.Mensaje = "msgAlertaLicenciaCaducado";
+                    result.Mensaje = "msgDiasDeGracia";
                     result.Res = true;
-
+                    result.Objeto = (int)eTipoErrors.LicenciaUltimoDiaconLicencia;
                     return result;
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {
                     result.Mensaje = "msgLicenciaExpirada";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.LicenciaVencida;
                     return result;
                 }
                 else if (empleados > (license.Empleados + (license.Empleados * 0.3)))
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaEmpleados;
                     return result;
                 }
                 else if (usuarios > (license.Usuarios + (license.Usuarios * 0.3)))
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaUsuarios;
                     return result;
                 }
                 else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaEmpleados;
                     return result;
                 }
                 else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     result.Res = false;
-
+                    result.Objeto = (int)eTipoErrors.ToleranciaUsuarios;
                     return result;
                 }
 

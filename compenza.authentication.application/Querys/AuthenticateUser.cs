@@ -66,7 +66,7 @@ namespace compenza.authentication.application.Querys
                 if (validarServer == (int)eTipoErrors.ErrorArchivo)
                 {
                     result.Mensaje = "msgServidorInvalido";
-                    result.Objeto = (int)eTipoErrors.ErrorArchivo;
+                    result.Objeto = (int)eTipoErrors.ServidorInvalido;
 
                     return result;
                 }
@@ -292,31 +292,38 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgAlertaLicencia";
                     isValidLicence = false;
+                    result.Objeto = (int)eTipoErrors.LicenciasAlertas;
+
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
                 {
                     result.Mensaje = "msgLicenciaExpirada";
                     isValidLicence = false;
+                    result.Objeto = (int)eTipoErrors.LicenciaVencida;
                 }
                 else if (empleados > (license.Empleados + (license.Empleados * 0.3)))
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     isValidLicence = false;
+                    result.Objeto = (int)eTipoErrors.ToleranciaEmpleados;
                 }
                 else if (usuarios > (license.Usuarios + (license.Usuarios * 0.3)))
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     isValidLicence = false;
+                    result.Objeto = (int)eTipoErrors.ToleranciaUsuarios;
                 }
                 else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceEmpleados)
                 {
                     result.Mensaje = "msgLicenciaLimiteEmpleados";
                     isValidLicence = false;
+                    result.Objeto = (int)eTipoErrors.ExeceEmpleados;
                 }
                 else if (await _propertiesConfig.ValidarEmpleados(empleadosTotal) == (int)eTipoErrors.ExeceUsuarios)
                 {
                     result.Mensaje = "msgLicenciaLimiteUsuarios";
                     isValidLicence = false;
+                    result.Objeto = (int)eTipoErrors.ExeceUsuarios;
                 }
 
                 return isValidLicence;

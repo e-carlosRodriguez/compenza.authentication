@@ -21,5 +21,6 @@ namespace compenza.authentication.domain.Configure
         public string? DBServerMessage { get; set; }
         public string? LogoCompenza { get; set; }
         public string? ImagenBackgroundCompenza { get; set; }
+        public bool Actualizarlicencia { get; set; }
     }
 }
