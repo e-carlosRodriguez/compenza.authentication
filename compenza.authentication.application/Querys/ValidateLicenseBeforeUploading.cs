@@ -66,7 +66,7 @@ namespace compenza.authentication.application.Querys
                     result.Actualizarlicencia = true;
                 }
 
-                if (license is null)
+                if (license.ID is null)
                 {
                     result.Mensaje = "msgLicenciaInvalida";
                     result.Objeto = (int)eResultado.ErrorLicencia;
@@ -78,9 +78,18 @@ namespace compenza.authentication.application.Querys
                 {
                     result.Mensaje = "msgServidorInvalido";
                     result.Objeto = (int)eTipoErrors.ServidorInvalido;
-                    result.DBServerMessage = license.BDServerID == "" ? null : $"ID: {license.BDServerID}";
-                    result.ServerMessage = license.BDServerID == "" ? null : $"ID: {license.ServerID}";
+                    result.DBServerMessage = validarServer == 9 ? null : $"ID: {license.BDServerID}";
+                    result.ServerMessage = validarServer == 9 ? null : $"ID: {license.ServerID}";
                     result.Res = false;
+
+                    return result;
+                }
+                else if (DateTime.Now.ToString("dd-MM-yyyy") == license.FechaLicencia.ToString("dd-MM-yyyy"))
+                {
+                    result.Actualizarlicencia = true;
+                    result.Mensaje = "msgLicenciaVencida";
+                    result.Objeto = (int)eTipoErrors.LicenciaVencidaAlerta;
+                    result.Res = true;
 
                     return result;
                 }
