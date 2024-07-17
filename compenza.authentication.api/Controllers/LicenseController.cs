@@ -168,13 +168,14 @@ namespace compenza.authentication.api.Controllers
             {
                 System.IO.File.Delete(dllpath);
 
-                result.Mensaje = "Licencia invalida.";
-                result.Objeto = (int)eTipoErrors.ErrorArchivo;
-                result.Res = false;
+                result.Mensaje = result.Mensaje;
+                result.Objeto = isValidLicense.Objeto;
+                result.Res = isValidLicense.Res;
                 apiResponse.StatusCode = HttpStatusCode.BadRequest;
-                apiResponse.Message = "Error";
+                apiResponse.Message = isValidLicense.Mensaje;
+                result.Actualizarlicencia = isValidLicense.Actualizarlicencia;
 
-                return Ok(apiResponse);
+                return BadRequest(apiResponse);
             }
 
             result.Mensaje = "Licencia cargada exitosamente.";
@@ -182,6 +183,7 @@ namespace compenza.authentication.api.Controllers
             result.Res = true;
             apiResponse.StatusCode = HttpStatusCode.OK;
             apiResponse.Message = "Ok";
+            result.Actualizarlicencia = isValidLicense.Actualizarlicencia;
 
             return Ok(apiResponse);
 
