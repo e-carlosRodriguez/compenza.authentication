@@ -282,11 +282,11 @@ namespace compenza.authentication.application.Querys
 
                 result = new Result();
 
-                if (license is null)
+                if (license.ID is null)
                 {
                     isValidLicence = false;
                     result.Mensaje = "msgLicenciaInvalida";
-                    result.Objeto = isValidLicence ? "" : (int)eResultado.ErrorLicencia;
+                    result.Objeto = isValidLicence ? "" : (int)eTipoErrors.SinLicencia;
                 }
                 else if (((int)(DateTime.Now - license.FechaLicencia).TotalDays) == 5)
                 {

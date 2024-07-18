@@ -69,7 +69,7 @@ namespace compenza.authentication.application.Querys
                 if (license.ID is null)
                 {
                     result.Mensaje = "msgLicenciaInvalida";
-                    result.Objeto = (int)eResultado.ErrorLicencia;
+                    result.Objeto = (int)eTipoErrors.SinLicencia;
                     result.Res = false;
 
                     return result;
