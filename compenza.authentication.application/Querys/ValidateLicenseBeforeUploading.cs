@@ -103,9 +103,9 @@ namespace compenza.authentication.application.Querys
                 }
                 else if (DateTime.Now >= license.FechaLicencia && diasExpiracion <= license.Expira)
                 {
-                    result.Mensaje = "msgDiasDeGracia";
+                    result.Mensaje = (license.Expira - diasExpiracion).ToString();
+                    result.Objeto = (int)eTipoErrors.LicenciaVencidaAlerta;
                     result.Res = true;
-                    result.Objeto = (int)eTipoErrors.LicenciaUltimoDiaconLicencia;
                     return result;
                 }
                 else if (DateTime.Now >= license.FechaLicencia.AddDays(license.Expira))
