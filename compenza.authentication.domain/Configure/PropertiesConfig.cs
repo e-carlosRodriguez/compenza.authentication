@@ -220,6 +220,7 @@ namespace compenza.authentication.domain.Configure
         SinCompenzaHistorico = 13,
         LicenciaValida = 14,
         ServidorInvalido = 15,
-        SinLicencia = 16
+        SinLicencia = 16,
+        SinInternet = 17
     }
 }
